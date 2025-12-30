@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import { Users, Phone, Mail, Clock, Plus, X, Trash2 } from 'lucide-react';
 import axios from 'axios';
-import { API_URL } from '../config'; // Add import
+import { API_URL } from '../config'; // Using your imported config
 
 const Teams = () => {
     const [teams, setTeams] = useState([]);
@@ -20,9 +20,8 @@ const Teams = () => {
 
     const fetchTeams = async () => {
         try {
+            // FIX 1: Removed the accidental post/delete lines that were causing the crash
             const res = await axios.get(`${API_URL}/teams`);
-            await axios.post(`${API_URL}/teams`, formData);
-            await axios.delete(`${API_URL}/teams/${id}`);
             setTeams(res.data);
         } catch (err) {
             console.error("Error fetching teams:", err);
@@ -33,7 +32,8 @@ const Teams = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("https://gearguard-wsig.onrender.com/api/teams", formData);
+            // FIX 2: Using API_URL instead of hardcoded link
+            await axios.post(`${API_URL}/teams`, formData);
             setShowForm(false);
             setFormData({ name: "", lead: "", email: "", phone: "", members: 0, shift: "Morning (8AM - 4PM)" }); // Reset
             fetchTeams(); // Refresh list
@@ -46,7 +46,8 @@ const Teams = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Delete this team?")) {
             try {
-                await axios.delete(`https://gearguard-wsig.onrender.com/api/teams/${id}`);
+                // FIX 2: Using API_URL instead of hardcoded link
+                await axios.delete(`${API_URL}/teams/${id}`);
                 fetchTeams();
             } catch (err) {
                 console.error(err);
@@ -57,7 +58,6 @@ const Teams = () => {
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />
-            {/* ml-0 on mobile, ml-64 on desktop. p-4 on mobile, p-8 on desktop */}
             <div className="flex-1 w-full ml-0 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 transition-all">
                 {/* Header */}
                 <div className="mb-8 flex justify-between items-end">
