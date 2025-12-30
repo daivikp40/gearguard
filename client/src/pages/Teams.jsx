@@ -3,8 +3,10 @@ import Sidebar from '../components/Sidebar';
 import { Users, Phone, Mail, Clock, Plus, X, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config'; // Using your imported config
+import { useNavigate } from 'react-router-dom'; // Add this
 
 const Teams = () => {
+    const navigate = useNavigate(); // Add this line
     const [teams, setTeams] = useState([]);
     const [showForm, setShowForm] = useState(false);
 
@@ -174,10 +176,14 @@ const Teams = () => {
                                     </p>
                                 </div>
 
-                                <button className="w-full mt-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium text-sm">
+                                <button
+                                    onClick={() => navigate(`/calendar?teamId=${team._id}`)}
+                                    className="w-full mt-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium text-sm"
+                                >
                                     View Schedule
                                 </button>
                             </div>
+
                         ))}
                     </div>
                 )}
