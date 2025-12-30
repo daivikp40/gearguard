@@ -1,98 +1,106 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import { Wrench, User, Mail, Lock, ArrowRight } from 'lucide-react';
-import { API_URL } from '../config'; // Add import
+import { LayoutDashboard, Wrench, Hammer, Users, Calendar, LogOut, Settings, Menu, X } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Signup = () => {
+const Sidebar = () => {
+    const location = useLocation();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ username: "", email: "", password: "" });
-    const [loading, setLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false); // State to toggle menu on mobile
 
-    const handleSignup = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            await axios.post(`${API_URL}/auth/register`, formData);
-            alert("Account created successfully!");
-            navigate("/login");
-        } catch (err) {
-            console.error(err);
-            // Check for Duplicate Email Error (11000)
-            if (err.response && err.response.data && err.response.data.code === 11000) {
-                alert("This email is already registered! Please Log In.");
-                navigate("/login");
-            } else {
-                alert("Error creating account. Please try again.");
-            }
-        } finally {
-            setLoading(false);
-        }
+    const menuItems = [
+        { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+        { name: "Maintenance", icon: Wrench, path: "/maintenance" },
+        { name: "Equipment", icon: Hammer, path: "/equipment" },
+        { name: "Teams", icon: Users, path: "/teams" },
+        { name: "Calendar", icon: Calendar, path: "/calendar" },
+    ];
+
+    const handleNavigate = (path) => {
+        navigate(path);
+        setIsOpen(false); // Close menu after clicking (for mobile)
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        navigate("/login");
     };
 
     return (
-        // UPDATED CLASS HERE 👇
-        <div className="min-h-screen flex items-center justify-center p-4 bg-login">
-            <div className="glass-card w-full max-w-md rounded-2xl p-8 md:p-10 relative overflow-hidden">
+        <>
+            {/* --- MOBILE MENU BUTTON (Visible only on small screens) --- */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
+            >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
 
-                <div className="relative z-10">
-                    <div className="flex justify-center mb-6">
-                        <div className="bg-white p-3 rounded-xl shadow-lg">
-                            <Wrench className="text-blue-600 h-8 w-8" />
+            {/* --- OVERLAY (Background dimmer when menu is open) --- */}
+            {isOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* --- SIDEBAR --- */}
+            <div className={`
+                h-screen w-64 bg-[#0f172a] text-white fixed left-0 top-0 flex flex-col justify-between z-50 shadow-2xl transition-transform duration-300
+                ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+                md:translate-x-0 
+            `}>
+                {/* Logo Area */}
+                <div className="p-6">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="bg-blue-600 p-2 rounded-lg">
+                            <Wrench size={24} />
                         </div>
+                        <span className="text-xl font-bold tracking-wide">GearGuard</span>
                     </div>
-                    <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Join GearGuard</h2>
-                    <p className="text-center text-gray-500 mb-8">Start managing your equipment professionally</p>
 
-                    <form onSubmit={handleSignup} className="space-y-4">
-                        <div className="relative group">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={20} />
-                            <input
-                                type="text"
-                                className="w-full pl-10 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                                placeholder="Full Name"
-                                onChange={e => setFormData({ ...formData, username: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="relative group">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={20} />
-                            <input
-                                type="email"
-                                className="w-full pl-10 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                                placeholder="Email Address"
-                                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="relative group">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={20} />
-                            <input
-                                type="password"
-                                className="w-full pl-10 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                                placeholder="Create Password"
-                                onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                required
-                            />
-                        </div>
+                    {/* Navigation Menu */}
+                    <nav className="space-y-2">
+                        {menuItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = location.pathname === item.path;
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 mt-4"
-                        >
-                            {loading ? "Creating Account..." : "Sign Up"}
-                            {!loading && <ArrowRight size={20} />}
-                        </button>
-                    </form>
+                            return (
+                                <button
+                                    key={item.name}
+                                    onClick={() => handleNavigate(item.path)}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
+                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
+                                        }`}
+                                >
+                                    <Icon size={20} />
+                                    <span className="font-medium">{item.name}</span>
+                                </button>
+                            );
+                        })}
+                    </nav>
+                </div>
 
-                    <div className="mt-8 text-center text-sm text-gray-600">
-                        Already have an account? <Link to="/login" className="text-blue-600 font-bold hover:underline">Log in</Link>
-                    </div>
+                {/* Bottom Section */}
+                <div className="p-6 border-t border-gray-800">
+                    <button
+                        onClick={() => handleNavigate('/settings')}
+                        className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors mb-4 w-full"
+                    >
+                        <Settings size={20} />
+                        <span>Settings</span>
+                    </button>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors w-full"
+                    >
+                        <LogOut size={20} />
+                        <span>Logout</span>
+                    </button>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
-export default Signup;
+export default Sidebar;
