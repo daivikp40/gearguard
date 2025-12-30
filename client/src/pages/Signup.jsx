@@ -1,106 +1,141 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Wrench, Hammer, Users, Calendar, LogOut, Settings, Menu, X } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { API_URL } from '../config'; // Make sure this path is correct for your project
 
-const Sidebar = () => {
-    const location = useLocation();
+const Signup = () => {
     const navigate = useNavigate();
-    const [isOpen, setIsOpen] = useState(false); // State to toggle menu on mobile
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const menuItems = [
-        { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-        { name: "Maintenance", icon: Wrench, path: "/maintenance" },
-        { name: "Equipment", icon: Hammer, path: "/equipment" },
-        { name: "Teams", icon: Users, path: "/teams" },
-        { name: "Calendar", icon: Calendar, path: "/calendar" },
-    ];
+    // Form State
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
 
-    const handleNavigate = (path) => {
-        navigate(path);
-        setIsOpen(false); // Close menu after clicking (for mobile)
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        navigate("/login");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        // 1. Basic Validation
+        if (formData.password !== formData.confirmPassword) {
+            return setError("Passwords do not match");
+        }
+
+        try {
+            setLoading(true);
+            // 2. Send Data to Backend
+            // Make sure your backend has a route: POST /api/auth/register
+            await axios.post(`${API_URL}/auth/register`, {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password
+            });
+
+            // 3. Success! Redirect to Login
+            alert("Account created! Please log in.");
+            navigate('/login');
+
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || "Error creating account. Try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <>
-            {/* --- MOBILE MENU BUTTON (Visible only on small screens) --- */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
-            >
-                {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800">GearGuard</h1>
+                    <p className="text-gray-500 mt-2">Create your account</p>
+                </div>
 
-            {/* --- OVERLAY (Background dimmer when menu is open) --- */}
-            {isOpen && (
-                <div
-                    className="md:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
-                    onClick={() => setIsOpen(false)}
-                />
-            )}
+                {/* Error Message */}
+                {error && (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
-            {/* --- SIDEBAR --- */}
-            <div className={`
-                h-screen w-64 bg-[#0f172a] text-white fixed left-0 top-0 flex flex-col justify-between z-50 shadow-2xl transition-transform duration-300
-                ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-                md:translate-x-0 
-            `}>
-                {/* Logo Area */}
-                <div className="p-6">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="bg-blue-600 p-2 rounded-lg">
-                            <Wrench size={24} />
-                        </div>
-                        <span className="text-xl font-bold tracking-wide">GearGuard</span>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="jdoe123"
+                            onChange={handleChange}
+                        />
                     </div>
 
-                    {/* Navigation Menu */}
-                    <nav className="space-y-2">
-                        {menuItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = location.pathname === item.path;
+                    <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="john@example.com"
+                            onChange={handleChange}
+                        />
+                    </div>
 
-                            return (
-                                <button
-                                    key={item.name}
-                                    onClick={() => handleNavigate(item.path)}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
-                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
-                                        }`}
-                                >
-                                    <Icon size={20} />
-                                    <span className="font-medium">{item.name}</span>
-                                </button>
-                            );
-                        })}
-                    </nav>
-                </div>
+                    <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="••••••••"
+                            onChange={handleChange}
+                        />
+                    </div>
 
-                {/* Bottom Section */}
-                <div className="p-6 border-t border-gray-800">
+                    <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="••••••••"
+                            onChange={handleChange}
+                        />
+                    </div>
+
                     <button
-                        onClick={() => handleNavigate('/settings')}
-                        className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors mb-4 w-full"
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
                     >
-                        <Settings size={20} />
-                        <span>Settings</span>
+                        {loading ? "Creating Account..." : "Sign Up"}
                     </button>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors w-full"
-                    >
-                        <LogOut size={20} />
-                        <span>Logout</span>
-                    </button>
+                </form>
+
+                {/* Footer */}
+                <div className="mt-6 text-center text-sm text-gray-600">
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-blue-600 font-bold hover:underline">
+                        Log In
+                    </Link>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
-export default Sidebar;
+export default Signup;
