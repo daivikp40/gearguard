@@ -40,7 +40,6 @@ const Dashboard = () => {
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />
             <div className="flex-1 ml-64 p-8">
-
                 {/* Page Header */}
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-gray-800">Executive Dashboard</h1>

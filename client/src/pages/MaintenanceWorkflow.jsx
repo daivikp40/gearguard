@@ -17,7 +17,7 @@ const MaintenanceWorkflow = () => {
 
     const fetchTasks = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/maintenance");
+            const res = await axios.get(`${API_URL}/maintenance`);
             setTasks(res.data);
         } catch (err) {
             console.error("Error fetching tasks:", err);
@@ -37,7 +37,7 @@ const MaintenanceWorkflow = () => {
 
         // 3. Send update to Backend
         try {
-            await axios.put(`http://localhost:5000/api/maintenance/${taskId}`, { stage: newStage });
+            await axios.put(`${API_URL}/maintenance/${taskId}`, { stage: newStage });
         } catch (err) {
             console.error("Failed to update status", err);
             alert("Failed to save status. Reverting...");
@@ -58,8 +58,8 @@ const MaintenanceWorkflow = () => {
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />
-            <div className="flex-1 ml-64 p-8">
-
+            {/* ml-0 on mobile, ml-64 on desktop. p-4 on mobile, p-8 on desktop */}
+            <div className="flex-1 w-full ml-0 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 transition-all">
                 {/* Header */}
                 <div className="flex justify-between items-end mb-8">
                     <div>
