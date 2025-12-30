@@ -8,7 +8,7 @@ const CalendarView = () => {
 
     useEffect(() => {
         const fetchTasks = async () => {
-            const res = await axios.get("http://localhost:5000/api/maintenance");
+            const res = await axios.get("https://gearguard-wsig.onrender.com/api/maintenance");
             // Simple sort by date
             const sorted = res.data.sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate));
             setTasks(sorted);

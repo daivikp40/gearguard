@@ -13,7 +13,7 @@ const EquipmentList = () => {
     useEffect(() => {
         const fetchEquipment = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/equipment");
+                const res = await axios.get("https://gearguard-wsig.onrender.com/api/equipment");
                 setEquipment(res.data);
                 setLoading(false);
             } catch (err) {
@@ -28,7 +28,7 @@ const EquipmentList = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this equipment?")) {
             try {
-                await axios.delete(`http://localhost:5000/api/equipment/${id}`);
+                await axios.delete(`https://gearguard-wsig.onrender.com/api/equipment/${id}`);
                 setEquipment(equipment.filter((item) => item._id !== id));
             } catch (err) {
                 console.error("Error deleting item:", err);

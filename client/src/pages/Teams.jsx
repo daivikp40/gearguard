@@ -33,7 +33,7 @@ const Teams = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/api/teams", formData);
+            await axios.post("https://gearguard-wsig.onrender.com/api/teams", formData);
             setShowForm(false);
             setFormData({ name: "", lead: "", email: "", phone: "", members: 0, shift: "Morning (8AM - 4PM)" }); // Reset
             fetchTeams(); // Refresh list
@@ -46,7 +46,7 @@ const Teams = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Delete this team?")) {
             try {
-                await axios.delete(`http://localhost:5000/api/teams/${id}`);
+                await axios.delete(`https://gearguard-wsig.onrender.com/api/teams/${id}`);
                 fetchTeams();
             } catch (err) {
                 console.error(err);

@@ -25,7 +25,7 @@ const EquipmentForm = () => {
         if (id) {
             const fetchEquipment = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:5000/api/equipment/${id}`);
+                    const res = await axios.get(`https://gearguard-wsig.onrender.com/api/equipment/${id}`);
                     setFormData(res.data);
                 } catch (err) {
                     console.error("Error fetching equipment:", err);
@@ -41,10 +41,10 @@ const EquipmentForm = () => {
         try {
             if (id) {
                 // UPDATE existing equipment
-                await axios.put(`http://localhost:5000/api/equipment/${id}`, formData);
+                await axios.put(`https://gearguard-wsig.onrender.com/api/equipment/${id}`, formData);
             } else {
                 // CREATE new equipment
-                await axios.post("http://localhost:5000/api/equipment", formData);
+                await axios.post("https://gearguard-wsig.onrender.com/api/equipment", formData);
             }
             navigate('/equipment'); // Go back to the list after saving
         } catch (err) {

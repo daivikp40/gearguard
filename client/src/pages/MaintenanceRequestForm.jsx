@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import { Save, ArrowLeft, Wrench, User, Trash2, Printer } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../config'; // Add import
 
 const MaintenanceRequestForm = () => {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ const MaintenanceRequestForm = () => {
     useEffect(() => {
         const fetchEquipment = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/equipment");
+                const res = await axios.get("https://gearguard-wsig.onrender.com/api/equipment");
                 setEquipmentList(res.data);
                 setLoading(false);
             } catch (err) {
@@ -46,7 +47,7 @@ const MaintenanceRequestForm = () => {
         if (id) {
             const fetchRequest = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:5000/api/maintenance/${id}`);
+                    const res = await axios.get(`https://gearguard-wsig.onrender.com/api/maintenance/${id}`);
                     setFormData(res.data);
                 } catch (err) {
                     console.error("Error fetching request:", err);
@@ -70,7 +71,7 @@ const MaintenanceRequestForm = () => {
     const handleDelete = async () => {
         if (window.confirm("Are you sure you want to delete this maintenance request?")) {
             try {
-                await axios.delete(`http://localhost:5000/api/maintenance/${id}`);
+                await axios.delete(`https://gearguard-wsig.onrender.com/api/maintenance/${id}`);
                 alert("Request deleted successfully.");
                 navigate('/dashboard');
             } catch (err) {
@@ -97,9 +98,9 @@ const MaintenanceRequestForm = () => {
 
         try {
             if (id) {
-                await axios.put(`http://localhost:5000/api/maintenance/${id}`, formData);
+                await axios.put(`https://gearguard-wsig.onrender.com/api/maintenance/${id}`, formData);
             } else {
-                await axios.post("http://localhost:5000/api/maintenance", formData);
+                await axios.post("https://gearguard-wsig.onrender.com/api/maintenance", formData);
             }
             navigate('/dashboard');
         } catch (err) {

@@ -39,7 +39,8 @@ const Dashboard = () => {
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />
-            <div className="flex-1 ml-64 p-8">
+            {/* ml-0 on mobile, ml-64 on desktop. p-4 on mobile, p-8 on desktop */}
+            <div className="flex-1 w-full ml-0 md:ml-64 p-4 md:p-8 pt-20 md:pt-8 transition-all">
                 {/* Page Header */}
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-gray-800">Executive Dashboard</h1>
