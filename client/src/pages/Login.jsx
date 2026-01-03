@@ -9,28 +9,27 @@ const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState(false);
+
+    // CHANGED: Use a string state to store the actual error message
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
-            // Send the token to your backend
             const res = await axios.post(`${API_URL}/auth/google`, {
                 googleToken: credentialResponse.credential
             });
-
-            // Handle login success
             localStorage.setItem("user", JSON.stringify(res.data));
             navigate("/dashboard");
         } catch (err) {
             console.log("Google Login Error:", err);
-            setError(true);
+            setError("Google Login Failed. Please try again.");
         }
     };
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError(false);
+        setError(""); // Clear previous errors
         setLoading(true);
         try {
             const res = await axios.post(`${API_URL}/auth/login`, { email, password });
@@ -38,7 +37,9 @@ const Login = () => {
             navigate("/dashboard");
         } catch (err) {
             console.error(err);
-            setError(true);
+            // CHANGED: Capture the specific message from the backend
+            // This is what catches "Please login with Google"
+            setError(err.response?.data?.message || "Login Failed. Please check credentials.");
         } finally {
             setLoading(false);
         }
@@ -46,10 +47,9 @@ const Login = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-login">
-            {/* GLASS CARD */}
             <div className="glass-card w-full max-w-md rounded-2xl p-8 md:p-10 relative overflow-hidden">
 
-                {/* Decorative Circle Effect */}
+                {/* Decorative Blob Effects */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
                 <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
 
@@ -94,9 +94,10 @@ const Login = () => {
                             </div>
                         </div>
 
+                        {/* CHANGED: Display the specific error string */}
                         {error && (
-                            <div className="bg-red-50 text-red-600 text-sm py-2 px-4 rounded-lg flex items-center justify-center animate-pulse">
-                                Login Failed. Please check credentials or try Google.
+                            <div className="bg-red-50 text-red-600 text-sm py-2 px-4 rounded-lg flex items-center justify-center animate-pulse border border-red-200">
+                                {error}
                             </div>
                         )}
 
@@ -110,7 +111,7 @@ const Login = () => {
                         </button>
                     </form>
 
-                    {/* --- GOOGLE LOGIN SECTION --- */}
+                    {/* GOOGLE LOGIN SECTION */}
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-gray-300"></div>
@@ -125,14 +126,12 @@ const Login = () => {
                             onSuccess={handleGoogleSuccess}
                             onError={() => {
                                 console.log('Google Login Failed');
-                                setError(true);
+                                setError("Google Login Failed");
                             }}
                             theme="filled_blue"
                             shape="pill"
-                        // Removed width="100%" to make it standard size
                         />
                     </div>
-                    {/* --------------------------- */}
 
                     <div className="mt-8 text-center text-sm text-gray-600 flex flex-col gap-2">
                         <div>
