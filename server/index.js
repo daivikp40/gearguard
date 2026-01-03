@@ -10,6 +10,15 @@ const teamRoute = require('./routes/teams'); // <--- 1. Import
 dotenv.config();
 
 const app = express();
+// 1. ADD THIS MIDDLEWARE BLOCK TO FIX GOOGLE LOGIN ERRORS
+app.use((req, res, next) => {
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+    next();
+});
+
+app.use(express.json());
+app.use(cors());
 
 // Middleware
 app.use(express.json());

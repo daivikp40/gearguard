@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Wrench, ArrowRight, Lock, Mail } from 'lucide-react';
-import { API_URL } from '../config'; // Add import
+import { API_URL } from '../config';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -11,12 +12,27 @@ const Login = () => {
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            // Send the token to your backend
+            const res = await axios.post(`${API_URL}/auth/google`, {
+                googleToken: credentialResponse.credential
+            });
+
+            // Handle login success
+            localStorage.setItem("user", JSON.stringify(res.data));
+            navigate("/dashboard");
+        } catch (err) {
+            console.log("Google Login Error:", err);
+            setError(true);
+        }
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(false);
         setLoading(true);
         try {
-            // Use your local URL or API_URL
             const res = await axios.post(`${API_URL}/auth/login`, { email, password });
             localStorage.setItem("user", JSON.stringify(res.data));
             navigate("/dashboard");
@@ -29,9 +45,8 @@ const Login = () => {
     };
 
     return (
-        // 1. ANIMATED BACKGROUND CONTAINER
         <div className="min-h-screen flex items-center justify-center p-4 bg-login">
-            {/* 2. GLASS CARD */}
+            {/* GLASS CARD */}
             <div className="glass-card w-full max-w-md rounded-2xl p-8 md:p-10 relative overflow-hidden">
 
                 {/* Decorative Circle Effect */}
@@ -81,7 +96,7 @@ const Login = () => {
 
                         {error && (
                             <div className="bg-red-50 text-red-600 text-sm py-2 px-4 rounded-lg flex items-center justify-center animate-pulse">
-                                Invalid email or password.
+                                Login Failed. Please check credentials or try Google.
                             </div>
                         )}
 
@@ -95,11 +110,42 @@ const Login = () => {
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center text-sm text-gray-600">
-                        Don't have an account?
-                        <Link to="/signup" className="text-blue-600 font-bold hover:text-blue-700 ml-1 hover:underline">
-                            Create Account
-                        </Link>
+                    {/* --- GOOGLE LOGIN SECTION --- */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white/50 text-gray-500 backdrop-blur-sm rounded">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center w-full">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => {
+                                console.log('Google Login Failed');
+                                setError(true);
+                            }}
+                            theme="filled_blue"
+                            shape="pill"
+                        // Removed width="100%" to make it standard size
+                        />
+                    </div>
+                    {/* --------------------------- */}
+
+                    <div className="mt-8 text-center text-sm text-gray-600 flex flex-col gap-2">
+                        <div>
+                            <Link to="/forgot-password" className="text-gray-500 hover:text-gray-800 transition-colors">
+                                Forgot Password?
+                            </Link>
+                        </div>
+                        <div>
+                            Don't have an account?
+                            <Link to="/signup" className="text-blue-600 font-bold hover:text-blue-700 ml-1 hover:underline">
+                                Create Account
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -12,6 +12,9 @@ import EquipmentForm from './pages/EquipmentForm';
 import CalendarView from './pages/CalendarView';
 import Teams from './pages/Teams';
 import Settings from './pages/Settings';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         {/* --- 1. DASHBOARD (Stats Only) --- */}
         <Route path="/dashboard" element={<Dashboard />} />
 

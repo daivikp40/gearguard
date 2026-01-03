@@ -1,13 +1,17 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema(
-    {
-        username: { type: String, required: true, min: 3, max: 20 },
-        email: { type: String, required: true, max: 50, unique: true },
-        password: { type: String, required: true, min: 6 },
-        role: { type: String, default: "Technician" }, // e.g., Admin, Manager, Technician
-    },
-    { timestamps: true }
-);
+const UserSchema = new mongoose.Schema({
+    username: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String }, // Optional because Google users won't have one
+    role: { type: String, default: 'technician' },
 
-module.exports = mongoose.model("User", UserSchema);
+    // Google Auth
+    googleId: { type: String },
+
+    // OTP System
+    otp: { type: String },
+    otpExpires: { type: Date }
+}, { timestamps: true });
+
+module.exports = mongoose.model('User', UserSchema);
